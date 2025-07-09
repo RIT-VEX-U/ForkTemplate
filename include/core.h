@@ -1,15 +1,22 @@
 #pragma once
 
+// Device package
+#include "core/device/cobs_device.h"
+
 // Subsystems package
+#include "core/subsystems/fun/pl_mpeg.h"
+#include "core/subsystems/fun/video.h"
+
+#include "core/subsystems/odometry/odometry_3wheel.h"
+#include "core/subsystems/odometry/odometry_base.h"
+#include "core/subsystems/odometry/odometry_nwheel.h"
+#include "core/subsystems/odometry/odometry_tank.h"
+
 #include "core/subsystems/custom_encoder.h"
 #include "core/subsystems/flywheel.h"
 #include "core/subsystems/layout.h"
 #include "core/subsystems/lift.h"
 #include "core/subsystems/mecanum_drive.h"
-#include "core/subsystems/odometry/odometry_3wheel.h"
-#include "core/subsystems/odometry/odometry_base.h"
-#include "core/subsystems/odometry/odometry_nwheel.h"
-#include "core/subsystems/odometry/odometry_tank.h"
 #include "core/subsystems/screen.h"
 #include "core/subsystems/tank_drive.h"
 
@@ -30,7 +37,17 @@
 #include "core/utils/controls/take_back_half.h"
 #include "core/utils/controls/trapezoid_profile.h"
 
+#include "core/utils/math/estimator/srukf.h"
+#include "core/utils/math/geometry/pose2d.h"
+#include "core/utils/math/geometry/rotation2d.h"
+#include "core/utils/math/geometry/transform2d.h"
+#include "core/utils/math/geometry/translation2d.h"
+#include "core/utils/math/geometry/twist2d.h"
+
+#include "core/utils/math/numerical/numerical_integration.h"
+
 #include "core/utils/auto_chooser.h"
+#include "core/utils/formatting.h"
 #include "core/utils/generic_auto.h"
 #include "core/utils/geometry.h"
 #include "core/utils/graph_drawer.h"
