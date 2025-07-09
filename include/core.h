@@ -28,6 +28,8 @@
 #include "core/utils/command_structure/drive_commands.h"
 #include "core/utils/command_structure/flywheel_commands.h"
 
+#include "core/utils/controls/state_space/linear_plant_inversion_feedforward.h"
+#include "core/utils/controls/state_space/linear_quadratic_regulator.h"
 #include "core/utils/controls/bang_bang.h"
 #include "core/utils/controls/feedback_base.h"
 #include "core/utils/controls/feedforward.h"
@@ -37,7 +39,8 @@
 #include "core/utils/controls/take_back_half.h"
 #include "core/utils/controls/trapezoid_profile.h"
 
-#include "core/utils/math/estimator/srukf.h"
+#include "core/utils/math/estimator/kalman_filter.h"
+#include "core/utils/math/estimator/unscented_kalman_filter.h"
 #include "core/utils/math/geometry/pose2d.h"
 #include "core/utils/math/geometry/rotation2d.h"
 #include "core/utils/math/geometry/transform2d.h"
@@ -46,11 +49,16 @@
 
 #include "core/utils/math/numerical/numerical_integration.h"
 
+#include "core/utils/math/systems/dare_solver.h"
+#include "core/utils/math/systems/discretization.h"
+#include "core/utils/math/systems/linear_system.h"
+
 #include "core/utils/auto_chooser.h"
 #include "core/utils/formatting.h"
 #include "core/utils/generic_auto.h"
 #include "core/utils/geometry.h"
 #include "core/utils/graph_drawer.h"
+#include "core/utils/interpolating_map.h"
 #include "core/utils/logger.h"
 #include "core/utils/math_util.h"
 #include "core/utils/moving_average.h"
