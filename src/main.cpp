@@ -2,6 +2,9 @@
 #include "robot-config.h"
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
+#include <cmath>
+#include <vex_task.h>
+#include "namespacer.hpp"
 
 vex::competition comp;
 
@@ -14,5 +17,8 @@ int main() {
     comp.autonomous(autonomous);
     comp.drivercontrol(opcontrol);
     comp.bStopAllTasksBetweenModes = true;
+
+    VDP::Packet packet;
+
     robot_init();
 }
