@@ -1,4 +1,4 @@
 #include "robot-config.h"
 
-void robot_init() {
-}
+void robot_init() {}
+
