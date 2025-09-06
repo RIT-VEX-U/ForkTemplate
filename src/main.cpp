@@ -1,8 +1,6 @@
 #include "vex.h"
-#include "robot-config.h"
-#include "competition/autonomous.h"
-#include "competition/opcontrol.h"
 #include <cmath>
+#include <vex_brain.h>
 #include <vex_task.h>
 
 vex::competition comp;
@@ -13,9 +11,11 @@ vex::competition comp;
  * competition/autonomous.cpp
 */
 int main() {
-    comp.autonomous(autonomous);
-    comp.drivercontrol(opcontrol);
-    comp.bStopAllTasksBetweenModes = true;
+    vex::brain brain = vex::brain();
+    brain.Screen.print("aweoifj\n");
 
-    robot_init();
+    double x = 2.0;
+    double cosx = cos(x);
+
+    brain.Screen.print("helloa %f\n", cosx);
 }
