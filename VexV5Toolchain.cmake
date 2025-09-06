@@ -244,9 +244,10 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
             endif()
         endif()
 
-        # clean up downloaded file
+        # clean up downloaded files
         file(REMOVE "${TOOLCHAIN_DOWNLOAD_FILE}")
         file(REMOVE "${NEWLIB_DIR}")
+        file(REMOVE "${NEWLIB_DOWNLOAD_FILE}")
         file(REMOVE_RECURSE "${VEX_GLOBAL_DIR}/newlib")
 
         message(STATUS "Toolchain installed to ${TOOLCHAIN_EXTRACT_PATH}")
@@ -370,8 +371,6 @@ if(NOT VEX_VEXCOM_PATH OR NOT EXISTS "${VEX_VEXCOM_PATH}")
         "Current VEX_VEXCOM_PATH: ${VEX_VEXCOM_PATH}")
 endif()
 
-set(VEX_GCC_PATH "${VEX_TOOLCHAIN_PATH}/gcc/bin")
-set(VEX_TOOLS_PATH "${VEX_TOOLCHAIN_PATH}/tools/bin")
 set(VEX_COMPILER_PATH "${VEX_TOOLCHAIN_PATH}/bin")
 
 # skip trying to compile test files with vex compiler (it always fails soo)
