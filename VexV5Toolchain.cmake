@@ -19,11 +19,13 @@
 
 # Set up global directory
 
+message(STATUS "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+
 if(WIN32)
   set(WINDOWS)
 elseif(APPLE)
   set(MACOS)
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
   set(AARCH64)
 else()
   set(LINUX64)
