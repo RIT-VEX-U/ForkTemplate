@@ -2,4 +2,3 @@
 /build
 .vscode/BROWSE.VC.DB*
 /.cache
-/vendor/*
