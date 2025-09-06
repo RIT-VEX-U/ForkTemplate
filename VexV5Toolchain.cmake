@@ -371,27 +371,14 @@ if(NOT VEX_VEXCOM_PATH OR NOT EXISTS "${VEX_VEXCOM_PATH}")
         "Current VEX_VEXCOM_PATH: ${VEX_VEXCOM_PATH}")
 endif()
 
-set(VEX_COMPILER_PATH "${VEX_TOOLCHAIN_PATH}/bin")
-
-# skip trying to compile test files with vex compiler (it always fails soo)
-set(CMAKE_C_COMPILER_WORKS 1)
-set(CMAKE_CXX_COMPILER_WORKS 1)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-
-# generic system (unless someone wants to convince cmake to accept a vexv5 system)
-set(CMAKE_SYSTEM_NAME               Generic)
-set(CMAKE_SYSTEM_PROCESSOR          arm)
-# vex stdlib is c++11
-# set (CMAKE_CXX_STANDARD 11)
-
-# windows compatibility
 if(WINDOWS)
     set(EXE_SUFFIX ".exe")
 else()
     set(EXE_SUFFIX "")
 endif()
 
-set(CMAKE_MAKE_PROGRAM              make CACHE FILEPATH "make" FORCE)
+set(VEX_COMPILER_PATH "${VEX_TOOLCHAIN_PATH}/bin")
+
 set(CMAKE_AR                        ${VEX_COMPILER_PATH}/llvm-ar${EXE_SUFFIX})
 set(CMAKE_C_COMPILER                ${VEX_COMPILER_PATH}/clang${EXE_SUFFIX})
 set(CMAKE_CXX_COMPILER              ${VEX_COMPILER_PATH}/clang${EXE_SUFFIX})
@@ -403,7 +390,7 @@ set(CMAKE_OBJDUMP                   ${VEX_COMPILER_PATH}/llvm-objdump${EXE_SUFFI
 set(CMAKE_SIZE                      ${VEX_COMPILER_PATH}/llvm-size${EXE_SUFFIX})
 
 # use the vex linker script
-set(CMAKE_C_LINK_EXECUTABLE   "<CMAKE_LINKER> -nostdlib -z norelro -T \"${VEX_SDK_PATH}/lscript1.ld\" --just-symbols=\"${VEX_SDK_PATH}/stdlib_0.lib\" --gc-sections -L\"${VEX_SDK_PATH}\" -L\"${VEX_TOOLCHAIN_PATH}/lib/clang-runtimes/newlib/arm-none-eabi/armv7a_soft_vfpv3_d16_unaligned/lib\" <OBJECTS> -o <TARGET> --start-group -lv5rt -lc++ -lc -lm -lclang_rt.builtins --end-group")
+set(CMAKE_C_LINK_EXECUTABLE  "<CMAKE_LINKER> -z norelro -T \"${VEX_SDK_PATH}/lscript1.ld\"  --gc-sections -L\"${VEX_SDK_PATH}\" -L\"${VEX_TOOLCHAIN_PATH}/lib/clang-runtimes/newlib/arm-none-eabi/armv7a_soft_vfpv3_d16_unaligned/lib\" <OBJECTS> -o <TARGET> --start-group -lv5rt -lc++ -lc -lm -lclang_rt.builtins --end-group")
 set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_C_LINK_EXECUTABLE})
 
 add_compile_options(-DVexV5)
@@ -428,18 +415,8 @@ set(CMAKE_CXX_FLAGS_RELEASE         "${CMAKE_C_FLAGS_RELEASE}" CACHE INTERNAL ""
 include_directories(SYSTEM "${VEX_TOOLCHAIN_PATH}/lib/clang-runtimes/newlib/arm-none-eabi/armv7a_soft_vfpv3_d16_unaligned/include/c++/v1")
 include_directories(SYSTEM "${VEX_TOOLCHAIN_PATH}/lib/clang-runtimes/newlib/arm-none-eabi/armv7a_soft_vfpv3_d16_unaligned/include")
 include_directories(SYSTEM "${VEX_TOOLCHAIN_PATH}/lib/clang/20/include")
-# include_directories(SYSTEM "${VEX_SDK_PATH}/clang/8.0.0/include")
-# include_directories(SYSTEM "${VEX_SDK_PATH}/gcc/include/c++/4.9.3")
-# include_directories(SYSTEM "${VEX_SDK_PATH}/gcc/include/c++/4.9.3/arm-none-eabi/armv7-ar/thumb")
-# include_directories(SYSTEM "${VEX_SDK_PATH}/gcc/include")
+
 include_directories(SYSTEM "${VEX_SDK_PATH}/include")
-
-set(GLOB_RECURSE vex_headers "${VEX_SDK_PATH}/include/*.h")
-
-# don't use system headers or libraries
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 function(vex_add_executable target_name)
     add_executable(${target_name})

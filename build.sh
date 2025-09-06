@@ -261,7 +261,7 @@ if [ "$NEEDS_CONFIGURE" = true ]; then
         fi
     fi
     
-    CONFIGURE_CMD="cmake -B $BUILD_DIR -G \"Unix Makefiles\" -DVEX_PROJECT_NAME=$PROJECT_NAME"
+    CONFIGURE_CMD="cmake -B $BUILD_DIR -G Ninja -DVEX_PROJECT_NAME=$PROJECT_NAME"
     if [ "$QUIET" = true ]; then
         CONFIGURE_CMD="$CONFIGURE_CMD -DVEX_QUIET_BUILD=ON"
     fi
