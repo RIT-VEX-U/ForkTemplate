@@ -193,7 +193,7 @@ if ($NeedsConfigure) {
     $ConfigureArgs = @(
         "-B", $BuildDir,
         "-DVEX_PROJECT_NAME=$ProjectName",
-        "-G", "Unix Makefiles"
+        "-G", "Ninja"
     )
     
     if ($Quiet) {
