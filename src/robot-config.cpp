@@ -14,7 +14,7 @@
     vex::motor front_right(PORT8, vex::gearSetting::ratio6_1, false);
     vex::motor_group right_motors(back_right, middle_right, front_right);
     //SENSORS
-    vex::inertial imu(PORT10);
+    // vex::inertial imu(PORT10);
     PID::pid_config_t drive_pid_cfg{
         .p = 0.0,
         .i = 0.0,
@@ -58,34 +58,35 @@
         .odom_gear_ratio = 0.75,
     };
 
-    OdometryTank odom(left_motors, right_motors, robot_cfg, &imu);
+    OdometryTank odom(left_motors, right_motors, robot_cfg);
 
     TankDrive drive_sys(left_motors, right_motors, robot_cfg, &odom);
 
     VDB::Device dev1{vex::PORT11, 115200 * 2};
 
-    VDP::RegistryController regcon1{&dev1};
+    VDP::RegistryController registry_contoller{&dev1};
     
 
     PIDTuner tuner(drive_pid, drive_sys);
 
-    VDP::PartPtr tuner_data = (std::shared_ptr<VDP::TimestampedRecord>)new VDP::TimestampedRecord(
-    "tuner_record", new VDP::PIDTunerRecord("tuner_record", tuner));
+    // VDP::PartPtr tuner_data = (std::shared_ptr<VDP::TimestampedRecord>)new VDP::TimestampedRecord(
+    // "tuner_record", new VDP::PIDTunerRecord("tuner_record", tuner));
 
 void robot_init() {
+    printf("STARTED\n");
 
-    VDP::ChannelID chan1 = regcon1.open_channel(tuner_data);
+    // VDP::ChannelID chan1 = registry_contoller.open_channel(tuner_data);
 
     odom.set_position({0,0,0});
-    while(imu.isCalibrating()){
-        vexDelay(10);
-    }
-    printf("IMU Calibrated\n");
-    regcon1.negotiate();
+    // while(imu.isCalibrating()){
+    //     vexDelay(10);
+    // }
+    // printf("IMU Calibrated\n");
 
-    bool ready = regcon1.negotiate();
+    bool ready = registry_contoller.negotiate();
 
-    if(!ready){
+    if (!ready) {
+        Brain.Screen.printAt(20, 20, "FAILED");
         while (true) {
             vexDelay(1000);
         };
@@ -95,7 +96,7 @@ void robot_init() {
 
     while (true) {
         printf("P: %f, I: %f, D: %f, Setpoint: %f, Error: %f\n", drive_pid.config.p, drive_pid.config.i, drive_pid.config.d, tuner.GetSetpoint(), drive_pid.get_error());
-        regcon1.send_data(chan1);
+        // registry_contoller.send_data(chan1);
         vexDelay(100);
     }
 }
