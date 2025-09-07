@@ -8,14 +8,14 @@
 # Global directory structure:
 # ~/.vex/vexcode/
 # |── V5_YYYYMMDD_HH_MM_SS/vexv5/           (SDK)
-# └── toolchain_platform/                   (Toolchain)
-#     ├── clang/bin/                        (Clang compiler)
-#     ├── gcc/bin/                          (GCC tools)
-#     └── tools/vexcom/                     (Vexcom)
-#
+# └── ATfE-20.1.0-platform/                 (Toolchain)
+#     ├── bin/                              (Clang compiler)
+#     ├── tools/vexcom/                     (Vexcom)
+#     └── tools/ninja/                      (Ninja build system)
 # Options:
 # -DVEX_FORCE_REINSTALL=ON: Force complete reinstallation by removing ~/.vex/vexcode directory
 # -DVEX_QUIET_BUILD=ON: Suppress compiler warnings during build
+
 
 # Set up global directory
 
@@ -291,7 +291,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_C_LINK_EXECUTABLE})
 
 add_compile_options(-DVexV5)
 
-set(CFLAGS_CL "-target thumbv7-none-eabi -fshort-enums -Wno-unknown-attributes -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=long -D__UINT32_TYPE__='unsigned long' -U__ARM_NEON__ -U__ARM_NEON")
+set(CFLAGS_CL "-target thumbv7-none-eabi -fshort-enums -Wno-unknown-attributes -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=long -D__UINT32_TYPE__=\"unsigned long\" -U__ARM_NEON__ -U__ARM_NEON")
 set(CFLAGS_V7 "-march=armv7-a -mfpu=neon -mfloat-abi=softfp")
 
 if(VEX_QUIET_BUILD)
