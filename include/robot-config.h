@@ -1,5 +1,6 @@
 #pragma once
-#include "core/utils/controls/boomerang.h"
+#include "core/utils/controls/pid_tuner.h"
+
 #include "core.h"
 #include "vex.h"
 
@@ -20,9 +21,12 @@
 
 // ================ SUBSYSTEMS ================
 extern TankDrive drive_sys;
+extern OdometryTank odom;
 
 
 // ================ UTILS ================
+extern vex::controller con;
+extern PIDTuner tuner;
 
 void robot_init();
 

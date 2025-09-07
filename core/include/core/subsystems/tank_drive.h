@@ -89,6 +89,11 @@ class TankDrive {
     Pose2d get_position();
 
     /**
+     * Sets the Robot position
+     */
+    void set_position(Pose2d new_pos);
+
+    /**
      * Drive the robot using differential style controls. left_motors controls
      * the left motors, right_motors controls the right motors.
      *

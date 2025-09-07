@@ -133,6 +133,54 @@ void PIDControlRecord::response() {
     pid.config.i = I->get_value();
     pid.config.d = D->get_value();
 }
+
+/**
+ * Creates a record that contains a
+ * Float of the pid P value
+ * Float of the pid I value
+ * Float of the pid D value
+ * Float of the pid error
+ * Float of the pid output
+ * String of the pid type (linear or angular)
+ * @param name the name of the record to create
+ * @param pid the pid to get data from
+ */
+PIDTunerRecord::PIDTunerRecord(std::string name, PIDTuner &pid_tuner)
+    : Record(std::move(name)), pid_tuner(pid_tuner), P(new Float("P")), I(new Float("I")), D(new Float("D")),
+      ERROR(new Float("Error")), OUTPUT(new Float("Output")), TYPE(new String("Type")), TUNING(new String("TUNING")), SETPOINT(new Float("Setpoint")) {
+    Record::set_fields({TYPE, P, I, D, SETPOINT, ERROR, OUTPUT, TUNING});
+}
+/**
+ * sets the data that the PID Parts hold to be sent to the board
+ */
+void PIDTunerRecord::fetch() {
+    P->set_value((float)pid_tuner.pid.config.p);
+    I->set_value((float)pid_tuner.pid.config.i);
+    D->set_value((float)pid_tuner.pid.config.d);
+    ERROR->set_value((float)pid_tuner.pid.get_error());
+    OUTPUT->set_value((float)pid_tuner.pid.get_output());
+    SETPOINT->set_value((float)pid_tuner.GetSetpoint());
+    if (pid_tuner.pid.config.error_method == PID::ANGULAR) {
+        TYPE->set_value("Angular");
+    } else {
+        TYPE->set_value("Linear");
+    }
+}
+
+void PIDTunerRecord::response() {
+    pid_tuner.pid.config.p = P->get_value();
+    pid_tuner.pid.config.i = I->get_value();
+    pid_tuner.pid.config.d = D->get_value();
+    pid_tuner.SetSetpoint(SETPOINT->get_value());
+    if(TUNING->get_value() == "TUNING"){
+        pid_tuner.StartTuning();
+    }
+    else if(TUNING->get_value() == "NOT TUNING"){
+        pid_tuner.StopTuning();
+    }
+
+}
+
 /**
  * Defines a record for testing purposes, currently tests a float and int64
  */

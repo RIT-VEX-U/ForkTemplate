@@ -1,6 +1,7 @@
 #pragma once
 #include "core/device/vdb/types.hpp"
 #include "core/subsystems/odometry/odometry_base.h"
+#include "core/utils/controls/pid_tuner.h"
 #include <Eigen/Dense>
 #include <memory>
 
@@ -165,6 +166,48 @@ class PIDControlRecord : public Record {
     std::shared_ptr<Float> I;
     std::shared_ptr<Float> D;
 };
+
+/**
+ * Defines a record that holds pid values to be sent to and from the board
+ */
+class PIDTunerRecord : public Record {
+  public:
+    /**
+     * Creates a record that contains a
+     * Float of the pid P value
+     * Float of the pid I value
+     * Float of the pid D value
+     * Float of the pid error
+     * Float of the pid output
+     * String of the pid type (linear or angular)
+     * @param name the name of the record to create
+     * @param pid the pid to get data from
+     */
+    PIDTunerRecord(std::string name, PIDTuner &pid_tuner);
+    /**
+     * sets the data that the PID Parts hold
+     */
+    void fetch() override;
+
+    /**
+     * sets the PID values to the values from the board
+     */
+    void response() override;
+
+  private:
+    PIDTuner &pid_tuner;
+    
+    std::shared_ptr<Float> P;
+    std::shared_ptr<Float> I;
+    std::shared_ptr<Float> D;
+    std::shared_ptr<Float> ERROR;
+    std::shared_ptr<Float> SETPOINT;
+    std::shared_ptr<Float> OUTPUT;
+    std::shared_ptr<String> TYPE;
+    std::shared_ptr<String> TUNING;
+};
+
+
 
 /**
  * Defines a record for testing purposes, currently tests a float and int64

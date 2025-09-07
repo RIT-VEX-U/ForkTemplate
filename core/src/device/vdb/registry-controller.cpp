@@ -104,7 +104,7 @@ ChannelID RegistryController::open_channel(PartPtr &for_data) {
  * @param data the Part Pointer for the channel to hold and send to the device
  */
 bool RegistryController::send_data(ChannelID id) {
-    channels[id].data->fetch();
+    // channels[id].data->fetch();
     if (timer.time() > rec_switch_time) {
         rec_mode = !rec_mode;
         timer.reset();

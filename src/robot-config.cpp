@@ -1,5 +1,4 @@
 #include "robot-config.h"
-void robot_init() {
 
     vex::brain Brain;
     vex::controller con;
@@ -54,14 +53,49 @@ void robot_init() {
         .correction_pid = correction_pid_cfg,
         .drive_feedback = &drive_pid,
         .turn_feedback = &turn_pid,
+        .odom_wheel_diam = 1.75,
         .dist_between_wheels = 12.25,
-        .odom_gear_ratio = 4/3,
+        .odom_gear_ratio = 0.75,
     };
+
     OdometryTank odom(left_motors, right_motors, robot_cfg, &imu);
 
     TankDrive drive_sys(left_motors, right_motors, robot_cfg, &odom);
 
+    VDB::Device dev1{vex::PORT11, 115200 * 2};
+
+    VDP::RegistryController regcon1{&dev1};
     
 
-}
+    PIDTuner tuner(drive_pid, drive_sys);
 
+    VDP::PartPtr tuner_data = (std::shared_ptr<VDP::TimestampedRecord>)new VDP::TimestampedRecord(
+    "tuner_record", new VDP::PIDTunerRecord("tuner_record", tuner));
+
+void robot_init() {
+
+    VDP::ChannelID chan1 = regcon1.open_channel(tuner_data);
+
+    odom.set_position({0,0,0});
+    while(imu.isCalibrating()){
+        vexDelay(10);
+    }
+    printf("IMU Calibrated\n");
+    regcon1.negotiate();
+
+    bool ready = regcon1.negotiate();
+
+    if(!ready){
+        while (true) {
+            vexDelay(1000);
+        };
+    }
+    printf("Negotiation Finished\n");
+    
+
+    while (true) {
+        printf("P: %f, I: %f, D: %f, Setpoint: %f, Error: %f\n", drive_pid.config.p, drive_pid.config.i, drive_pid.config.d, tuner.GetSetpoint(), drive_pid.get_error());
+        regcon1.send_data(chan1);
+        vexDelay(100);
+    }
+}
