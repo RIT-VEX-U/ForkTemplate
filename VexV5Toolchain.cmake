@@ -175,21 +175,19 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
 
     # use the right URL for the platform
     if(WINDOWS)
-        set(TOOLCHAIN_URL "https://github.com/arm/arm-toolchain/releases/download/release-20.1.0-ATfE/ATfE-20.1.0-Windows-x86_64.zip")
+        set(TOOLCHAIN_URL "https://github.com/RIT-VEX-U/ForkTemplate/releases/download/1.0/ATfE-20.1.0-Windows-x86_64.zip")
         set(TOOLCHAIN_SUBDIR "ATfE-20.1.0-Windows-x86_64")
       elseif(MACOS)
-        set(TOOLCHAIN_URL "https://github.com/arm/arm-toolchain/releases/download/release-20.1.0-ATfE/ATfE-20.1.0-Darwin-universal.dmg")
+        set(TOOLCHAIN_URL "https://github.com/RIT-VEX-U/ForkTemplate/releases/download/1.0/ATfE-20.1.0-Darwin-universal.zip")
         set(TOOLCHAIN_SUBDIR "ATfE-20.1.0-Darwin-universal")
       elseif(AARCH64)
-        set(TOOLCHAIN_URL "https://github.com/arm/arm-toolchain/releases/download/release-20.1.0-ATfE/ATfE-20.1.0-Linux-AArch64.tar.xz")
+        set(TOOLCHAIN_URL "https://github.com/RIT-VEX-U/ForkTemplate/releases/download/1.0/ATfE-20.1.0-Linux-AArch64.tar.xz")
         set(TOOLCHAIN_SUBDIR "ATfE-20.1.0-Linux-AArch64")
       else()
-        set(TOOLCHAIN_URL "https://github.com/arm/arm-toolchain/releases/download/release-20.1.0-ATfE/ATfE-20.1.0-Linux-x86_64.tar.xz")
+        set(TOOLCHAIN_URL "https://github.com/RIT-VEX-U/ForkTemplate/releases/download/1.0/ATfE-20.1.0-Linux-x86_64.tar.xz")
         set(TOOLCHAIN_SUBDIR "ATfE-20.1.0-Linux-x86_64")
     endif()
 
-    set(NEWLIB_URL "https://github.com/arm/arm-toolchain/releases/download/release-20.1.0-ATfE/ATfE-newlib-overlay-20.1.0.tar.xz")
-    set(NEWLIB_DOWNLOAD_FILE "${VEX_GLOBAL_DIR}/ATfE-newlib-overlay-20.1.0")
 
     set(TOOLCHAIN_EXTRACT_PATH "${VEX_GLOBAL_DIR}/${TOOLCHAIN_SUBDIR}")
     set(TOOLCHAIN_DOWNLOAD_FILE "${VEX_GLOBAL_DIR}/vex-toolchain.zip")
@@ -212,25 +210,6 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
         message(STATUS "Extracting toolchain...")
         file(ARCHIVE_EXTRACT INPUT "${TOOLCHAIN_DOWNLOAD_FILE}" DESTINATION "${VEX_GLOBAL_DIR}")
 
-        message(STATUS "Downloads newlib")
-        file(DOWNLOAD "${NEWLIB_URL}" "${NEWLIB_DOWNLOAD_FILE}"
-             SHOW_PROGRESS
-             STATUS DOWNLOAD_STATUS)
-
-        list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
-        if(NOT STATUS_CODE EQUAL 0)
-            list(GET DOWNLOAD_STATUS 1 ERROR_MSG)
-            message(FATAL_ERROR "Failed to download newlib: ${ERROR_MSG}")
-        endif()
-
-        message(STATUS "Extracting newlib...")
-
-        file(MAKE_DIRECTORY "${VEX_GLOBAL_DIR}/newlib")
-        set(NEWLIB_DIR "${VEX_GLOBAL_DIR}/newlib")
-
-        file(ARCHIVE_EXTRACT INPUT "${NEWLIB_DOWNLOAD_FILE}" DESTINATION "${NEWLIB_DIR}")
-        file(COPY "${NEWLIB_DIR}/lib/clang-runtimes/newlib/arm-none-eabi/armv7a_soft_vfpv3_d16_unaligned" DESTINATION "/home/pascal/.vex/vexcode/ATfE-20.1.0-Linux-x86_64/lib/clang-runtimes/newlib/arm-none-eabi")
-
         # set execute permissions on unix like systems
         if(UNIX)
             execute_process(
@@ -246,9 +225,9 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
 
         # clean up downloaded files
         file(REMOVE "${TOOLCHAIN_DOWNLOAD_FILE}")
-        file(REMOVE "${NEWLIB_DIR}")
-        file(REMOVE "${NEWLIB_DOWNLOAD_FILE}")
-        file(REMOVE_RECURSE "${VEX_GLOBAL_DIR}/newlib")
+
+        set(VEX_VEXCOM_PATH ${TOOLCHAIN_EXTRACT_PATH}/tools/vexcom)
+
 
         message(STATUS "Toolchain installed to ${TOOLCHAIN_EXTRACT_PATH}")
     else()
@@ -257,95 +236,10 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
 
     if(EXISTS "${TOOLCHAIN_EXTRACT_PATH}")
         set(VEX_TOOLCHAIN_PATH "${TOOLCHAIN_EXTRACT_PATH}")
+        set(VEX_VEXCOM_PATH "${VEX_TOOLCHAIN_PATH}/tools/vexcom")
         message(STATUS "Successfully installed Toolchain to global directory")
     else()
         message(FATAL_ERROR "Toolchain installation failed")
-    endif()
-endif()
-
-# download vexcom if not found
-if(VEX_VEXCOM_PATH AND EXISTS "${VEX_VEXCOM_PATH}")
-    set(VEX_VEXCOM_PATH "${VEX_VEXCOM_PATH}")
-    message(STATUS "Using existing vexcom from environment")
-else()
-    set(VEX_VEXCOM_PATH "${VEX_TOOLCHAIN_PATH}/tools/vexcom")
-endif()
-
-if(NOT EXISTS "${VEX_VEXCOM_PATH}")
-    message(STATUS "vexcom not found, will download automatically...")
-
-    set(VEXCOM_URL "https://openvsxorg.blob.core.windows.net/resources/VEXRobotics/vexcode/0.6.1/VEXRobotics.vexcode-0.6.1.vsix")
-    set(VEXCOM_DOWNLOAD_FILE "${VEX_GLOBAL_DIR}/vex-vexcom.zip")
-
-    message(STATUS "Downloading vexcom to ${VEX_VEXCOM_PATH}...")
-
-    file(MAKE_DIRECTORY "${VEX_GLOBAL_DIR}")
-
-    file(DOWNLOAD "${VEXCOM_URL}" "${VEXCOM_DOWNLOAD_FILE}"
-         SHOW_PROGRESS
-         STATUS DOWNLOAD_STATUS)
-
-    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
-    if(NOT STATUS_CODE EQUAL 0)
-        list(GET DOWNLOAD_STATUS 1 ERROR_MSG)
-        message(FATAL_ERROR "Failed to download vexcom: ${ERROR_MSG}")
-    endif()
-
-    message(STATUS "Extracting vexcom...")
-    file(ARCHIVE_EXTRACT INPUT "${VEXCOM_DOWNLOAD_FILE}" DESTINATION "${VEX_GLOBAL_DIR}")
-
-    # determine platform subdirectory
-    if(WINDOWS)
-        set(VEXCOM_PLATFORM "win32")
-      elseif(MACOS)
-        set(VEXCOM_PLATFORM "osx")
-      elseif(AARCH64)
-        set(VEXCOM_PLATFORM "linux-arm64")
-      else()
-        set(VEXCOM_PLATFORM "linux-x64")
-    endif()
-
-    set(VEXCOM_SOURCE_DIR "${VEX_GLOBAL_DIR}/extension/resources/tools/vexcom/${VEXCOM_PLATFORM}")
-    set(VEXCOM_DEST_DIR "${VEX_TOOLCHAIN_PATH}/tools/vexcom")
-
-    # create directory if it doesn't exist
-    file(MAKE_DIRECTORY "${VEXCOM_DEST_DIR}")
-
-    # copy vexcom platform files to toolchain tools directory
-    if(EXISTS "${VEXCOM_SOURCE_DIR}")
-        file(COPY "${VEXCOM_SOURCE_DIR}/" DESTINATION "${VEXCOM_DEST_DIR}")
-        message(STATUS "Copied vexcom ${VEXCOM_PLATFORM} files to ${VEXCOM_DEST_DIR}")
-
-        # set execute permissions on unix like systems
-        if(UNIX)
-            execute_process(
-                COMMAND chmod -R +x "${VEXCOM_DEST_DIR}"
-                RESULT_VARIABLE VEXCOM_CHMOD_RESULT
-                OUTPUT_QUIET
-                ERROR_QUIET
-            )
-            if(NOT VEXCOM_CHMOD_RESULT EQUAL 0)
-                message(WARNING "Failed to set execute permissions on ${VEXCOM_DEST_DIR}")
-            endif()
-        endif()
-    else()
-        message(FATAL_ERROR "Vexcom source directory not found: ${VEXCOM_SOURCE_DIR}")
-    endif()
-
-    # clean up the extracted extension folder and garbage files
-    file(REMOVE_RECURSE "${VEX_GLOBAL_DIR}/extension")
-    file(GLOB GARBAGE_FILES "${VEX_GLOBAL_DIR}/*.xml" "${VEX_GLOBAL_DIR}/*.vsixmanifest")
-    if(GARBAGE_FILES)
-        file(REMOVE ${GARBAGE_FILES})
-    endif()
-
-    # clean up downloaded file
-    file(REMOVE "${VEXCOM_DOWNLOAD_FILE}")
-
-    if(EXISTS "${VEX_VEXCOM_PATH}")
-        message(STATUS "Successfully installed vexcom to toolchain directory")
-    else()
-        message(FATAL_ERROR "Vexcom installation failed")
     endif()
 endif()
 
@@ -364,13 +258,7 @@ if(NOT VEX_TOOLCHAIN_PATH OR NOT EXISTS "${VEX_TOOLCHAIN_PATH}")
         "Current VEX_TOOLCHAIN_PATH: ${VEX_TOOLCHAIN_PATH}")
 endif()
 
-if(NOT VEX_VEXCOM_PATH OR NOT EXISTS "${VEX_VEXCOM_PATH}")
-    message(FATAL_ERROR
-        "Vexcom not found and download failed.\n"
-        "Manually set VEX_VEXCOM_PATH or check your internet connection.\n"
-        "Current VEX_VEXCOM_PATH: ${VEX_VEXCOM_PATH}")
-endif()
-
+# set(CMAKE_MAKE_PROGRAM              ${VEX_TOOLCHAIN_PATH}/tools/ninja/ninja${EXE_SUFFIX})
 if(WINDOWS)
     set(EXE_SUFFIX ".exe")
 else()
@@ -379,6 +267,14 @@ endif()
 
 set(VEX_COMPILER_PATH "${VEX_TOOLCHAIN_PATH}/bin")
 
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+set(CMAKE_SYSTEM_NAME               Generic)
+set(CMAKE_SYSTEM_PROCESSOR          arm)
+
+set(CMAKE_MAKE_PROGRAM              ${VEX_TOOLCHAIN_PATH}/tools/ninja/ninja${EXE_SUFFIX} CACHE FILEPATH "${VEX_TOOLCHAIN_PATH}/tools/ninja/ninja${EXE_SUFFIX}" FORCE)
 set(CMAKE_AR                        ${VEX_COMPILER_PATH}/llvm-ar${EXE_SUFFIX})
 set(CMAKE_C_COMPILER                ${VEX_COMPILER_PATH}/clang${EXE_SUFFIX})
 set(CMAKE_CXX_COMPILER              ${VEX_COMPILER_PATH}/clang${EXE_SUFFIX})
