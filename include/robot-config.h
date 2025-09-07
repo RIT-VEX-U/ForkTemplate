@@ -1,5 +1,5 @@
 #pragma once
-
+#include "core/utils/controls/boomerang.h"
 #include "core.h"
 #include "vex.h"
 
@@ -19,7 +19,7 @@
 
 
 // ================ SUBSYSTEMS ================
-
+extern TankDrive drive_sys;
 
 
 // ================ UTILS ================
