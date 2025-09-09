@@ -23,7 +23,6 @@
 extern TankDrive drive_sys;
 extern OdometryTank odom;
 
-
 // ================ UTILS ================
 extern vex::controller con;
 extern PIDTuner tuner;

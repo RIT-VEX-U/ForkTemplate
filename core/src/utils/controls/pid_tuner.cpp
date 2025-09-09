@@ -35,6 +35,7 @@ int PIDTuner::thread_fn(void *ptr) {
                 self.drive_sys.drive_forward(self.setpoint, vex::forward);
             }
         }
+        vexDelay(100);
     }
     return 0;
 }

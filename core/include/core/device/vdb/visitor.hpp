@@ -19,6 +19,7 @@ public:
 
   void VisitFloat(VDP::Float *float_part) override;
   void VisitDouble(VDP::Double *double_part) override;
+  void VisitBoolean(VDP::Boolean *boolean_part) override;
 
   void VisitInt64(VDP::Int64 *int64_part) override;
   void VisitInt32(VDP::Int32 *int32_part) override;

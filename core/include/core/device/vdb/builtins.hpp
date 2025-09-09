@@ -200,11 +200,10 @@ class PIDTunerRecord : public Record {
     std::shared_ptr<Float> P;
     std::shared_ptr<Float> I;
     std::shared_ptr<Float> D;
+    std::shared_ptr<Boolean> ISTUNING;
     std::shared_ptr<Float> ERROR;
     std::shared_ptr<Float> SETPOINT;
     std::shared_ptr<Float> OUTPUT;
-    std::shared_ptr<String> TYPE;
-    std::shared_ptr<String> TUNING;
 };
 
 
