@@ -167,6 +167,14 @@ uint8_t PacketReader::get_byte() {
     return b;
 }
 /**
+ * @return the current byte the reader is on represented as a boolean
+ */
+bool PacketReader::get_bool() {
+    bool b = pac[read_head];
+    read_head++;
+    return b;
+}
+/**
  * @return the current type the reader is on
  */
 Type PacketReader::get_type() {
@@ -207,6 +215,7 @@ size_t PacketWriter::size() { return sofar.size(); }
  * @param b the byte to write
  */
 void PacketWriter::write_byte(uint8_t b) { sofar.push_back(b); }
+
 /**
  * writes a VDP type to the packet in the form of a byte
  * @param t the VDP type to write to the packet
@@ -351,7 +360,8 @@ PartPtr make_decoder(PacketReader &pac) {
         return PartPtr(new Float(name));
     case Type::Double:
         return PartPtr(new Double(name));
-
+    case Type::Boolean:
+        return PartPtr(new Boolean(name));
     case Type::Uint8:
         return PartPtr(new Uint8(name));
     case Type::Uint16:

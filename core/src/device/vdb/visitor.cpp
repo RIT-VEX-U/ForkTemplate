@@ -46,6 +46,16 @@ void ResponsePacketVisitor::VisitDouble(VDP::Double *double_part) {
 /**
  * checks if the value if the lowest possible number it can be, if it is skip it otherwise replace our datw with the new number
  */
+void ResponsePacketVisitor::VisitBoolean(VDP::Boolean *boolean_part) {
+  VDP::Boolean *from_boolean = reinterpret_cast<VDP::Boolean*>(from_part.get());
+  if(from_boolean->get_value() != std::numeric_limits<double>().min()){
+    printf("found double\n");
+    boolean_part->set_value(from_boolean->get_value());
+  }
+}
+/**
+ * checks if the value if the lowest possible number it can be, if it is skip it otherwise replace our datw with the new number
+ */
 void ResponsePacketVisitor::VisitInt64(VDP::Int64 *int64_part) {
   VDP::Int64 *from_int64 = reinterpret_cast<VDP::Int64*>(from_part.get());
   if(from_int64->get_value() != std::numeric_limits<int64_t>().min()){

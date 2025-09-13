@@ -145,6 +145,74 @@ class String : public Part {
     std::string value;
 };
 
+/**
+ * A string type conveyed as a part
+ */
+class Boolean : public Part {
+    friend PacketReader;
+    friend PacketWriter;
+
+  public:
+    using FetchFunc = std::function<bool()>;
+    /**
+     * creates a string type conveyed as a part with a name and a fetcher
+     * @param name name of the string to have
+     * @param fetcher the fetch function to use when running fetch()
+     */
+    explicit Boolean(std::string name, FetchFunc fetcher = []() { return false; });
+    /**
+     * function to run when fetching this part, runs the fetch function
+     */
+    void fetch() override;
+
+    /**
+     * function to run when receiving to this part
+     */
+    void response() override;
+
+    /**
+     * sets the string part's value to the string given
+     * @param new_value the string to set the value to
+     */
+    void set_value(bool new_value);
+
+    /**
+     * @return the currently stored string
+     */
+    bool get_value();
+
+    PartPtr clone() override;
+    /**
+     * sets the string part's value to the string read by a packet reader
+     * @param reader the packet reader to get the string from
+     */
+    void read_data_from_message(PacketReader &reader) override;
+    /**
+     * changes a stringstream to be formatted as
+     * name: string
+     * @param ss the stringstream to change
+     * @param indent the amount of indents to use
+     */
+    void pprint(std::stringstream &ss, size_t indent) const override;
+    /**
+     * changes a stringstream to be formatted as
+     * name: value
+     * @param ss the stringstream to change
+     * @param indent the amount of indents to use
+     */
+    void pprint_data(std::stringstream &ss, size_t indent) const override;
+
+    void Visit(Visitor *);
+
+  protected:
+    void write_schema(PacketWriter &sofar) const override;
+    void write_message(PacketWriter &sofar) const override;
+
+  private:
+    FetchFunc fetcher;
+    uint8_t value;
+};
+
 // Template to reduce boiler plate for Schema wrappers for simple types
 // Fixed size, numeric types  such as uin8_t, uint32, float, double
 /**
@@ -343,6 +411,7 @@ public:
 
   virtual void VisitFloat(Float *) = 0;
   virtual void VisitDouble(Double *) = 0;
+  virtual void VisitBoolean(Boolean *) = 0;
 
   virtual void VisitUint8(Uint8 *) = 0;
   virtual void VisitUint16(Uint16 *) = 0;
