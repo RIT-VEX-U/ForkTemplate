@@ -69,7 +69,7 @@ double Translation2d::norm() const { return std::hypot(m_x, m_y); }
  *
  * @return the norm of the translation.
  */
-Translation2d Translation2d::normalize() const { return Translation2d(1, theta()); };
+Translation2d Translation2d::normalize(double norm) const { return Translation2d(1, theta()); };
 
 /**
  * Returns the distance between two translations.

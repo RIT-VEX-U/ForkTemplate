@@ -98,7 +98,7 @@ class Translation2d {
      *
      * @return the norm of the translation.
      */
-    Translation2d normalize() const;
+    Translation2d normalize(double norm = 1) const;
 
     /**
      * Returns the distance between two translations.

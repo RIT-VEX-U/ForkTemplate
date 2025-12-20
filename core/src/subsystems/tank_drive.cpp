@@ -1,4 +1,5 @@
 #include "core/subsystems/tank_drive.h"
+#include <vex_units.h>
 #include "core/utils/command_structure/drive_commands.h"
 #include "core/utils/controls/pidff.h"
 #include "core/utils/geometry.h"
@@ -123,8 +124,8 @@ void TankDrive::stop() {
 Pose2d TankDrive::get_position() { return this->odometry->get_position(); }
 
 void TankDrive::drive_tank_raw(double left_norm, double right_norm) {
-    left_motors.spin(directionType::fwd, left_norm * 12, voltageUnits::volt);
-    right_motors.spin(directionType::fwd, right_norm * 12, voltageUnits::volt);
+    left_motors.spin(directionType::fwd, left_norm * 100, vex::velocityUnits::pct);
+    right_motors.spin(directionType::fwd, right_norm * 100, vex::velocityUnits::pct);
 }
 /**
  * Drive the robot using differential style controls. left_motors controls the

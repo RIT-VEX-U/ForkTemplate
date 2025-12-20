@@ -261,7 +261,7 @@ if [ "$NEEDS_CONFIGURE" = true ]; then
         fi
     fi
     
-    CONFIGURE_CMD="cmake -B $BUILD_DIR -G Ninja -DVEX_PROJECT_NAME=$PROJECT_NAME"
+    CONFIGURE_CMD="cmake -B $BUILD_DIR -G \"Unix Makefiles\" -DVEX_PROJECT_NAME=$PROJECT_NAME"
     if [ "$QUIET" = true ]; then
         CONFIGURE_CMD="$CONFIGURE_CMD -DVEX_QUIET_BUILD=ON"
     fi
@@ -341,15 +341,14 @@ if [ "$UPLOAD" = true ]; then
     
     # find vexcom executable
     VEXCOM_PATH=""
-    VEX_GLOBAL_DIR="$HOME/.vex/vexcode"
-
+    
     # determine the correct VEX toolchain path based on platform
     if [ "$(uname)" = "Darwin" ]; then
-        TOOLCHAIN_SUBDIR="ATfE-20.1.0-Darwin-universal"
-    elif [ "$(uname -m)" = "x86_64" ]; then
-        TOOLCHAIN_SUBDIR="ATfE-20.1.0-Linux-x86_64"
+        VEX_GLOBAL_DIR="$HOME/.vex/vexcode"
+        TOOLCHAIN_SUBDIR="toolchain_osx64"
     else
-        TOOLCHAIN_SUBDIR="ATfE-20.1.0-Linux-AArch64" 
+        VEX_GLOBAL_DIR="$HOME/.vex/vexcode"
+        TOOLCHAIN_SUBDIR="toolchain_linux64"
     fi
     
     VEX_TOOLCHAIN_PATH_DETECTED="$VEX_GLOBAL_DIR/$TOOLCHAIN_SUBDIR"
@@ -358,6 +357,17 @@ if [ "$UPLOAD" = true ]; then
     if [ -f "$VEX_TOOLCHAIN_PATH_DETECTED/tools/vexcom/vexcom" ]; then
         VEXCOM_PATH="$VEX_TOOLCHAIN_PATH_DETECTED/tools/vexcom/vexcom"
         print_color $GREEN "Found vexcom in toolchain: $VEX_TOOLCHAIN_PATH_DETECTED"
+    # try environment variable as fallback
+    elif [ -n "$VEX_TOOLCHAIN_PATH" ] && [ -f "$VEX_TOOLCHAIN_PATH/tools/vexcom/vexcom" ]; then
+        VEXCOM_PATH="$VEX_TOOLCHAIN_PATH/tools/vexcom/vexcom"
+        print_color $GREEN "Found vexcom in environment toolchain: $VEX_TOOLCHAIN_PATH"
+    # fallback to PATH
+    elif command -v vexcom >/dev/null 2>&1; then
+        VEXCOM_PATH="vexcom"
+    else
+        print_color $RED "Error: vexcom not found in toolchain or PATH"
+        print_color $RED "Make sure VEX toolchain is properly installed"
+        exit 1
     fi
     
     # get upload slot number
