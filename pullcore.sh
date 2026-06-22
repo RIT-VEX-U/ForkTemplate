@@ -1,3 +1,0 @@
-#!/bin/bash
-
-git subtree pull --prefix=core git@github.com:RIT-VEX-U/Core.git main
