@@ -1,3 +1,0 @@
-#!/bin/bash
-
-git subtree push --prefix=core git@github.com:RIT-VEX-U/Core.git main
