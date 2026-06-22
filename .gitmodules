@@ -5,3 +5,6 @@
 [submodule "vendor/gcem"]
 	path = vendor/gcem
 	url = https://github.com/kthohr/gcem.git
+[submodule "Core"]
+	path = Core
+	url = https://github.com/RIT-VEX-U/Core
