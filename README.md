@@ -3,7 +3,7 @@
 A template for starting a new project using RIT-VEX-U's core library.
 
 Includes:
-- Core library (as a subtree)
+- Core library (as a submodule)
 - Eigen linear algebra library (as a submodule)
 - A github action to test compilation
 
