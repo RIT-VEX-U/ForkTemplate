@@ -1,7 +1,7 @@
 [submodule "vendor/eigen"]
 	path = vendor/eigen
 	url = https://gitlab.com/libeigen/eigen.git
-	branch = 3.4.0
+	branch = 5.0.1
 [submodule "vendor/gcem"]
 	path = vendor/gcem
 	url = https://github.com/kthohr/gcem.git
