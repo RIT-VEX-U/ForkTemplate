@@ -1,9 +1,7 @@
-#include "vex.h"
-
-#include "robot-config.h"
-
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
+#include "robot-config.h"
+#include "vex.h"
 
 vex::competition comp;
 
@@ -13,8 +11,8 @@ vex::competition comp;
  * competition/autonomous.cpp
  */
 int main() {
-  comp.autonomous(autonomous);
-  comp.drivercontrol(opcontrol);
+    comp.autonomous(autonomous);
+    comp.drivercontrol(opcontrol);
 
-  robot_init();
+    robot_init();
 }
