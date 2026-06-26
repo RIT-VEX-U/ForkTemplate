@@ -7,4 +7,4 @@
 	url = https://github.com/kthohr/gcem.git
 [submodule "core"]
 	path = core
-	url = git@github.com/RIT-VEX-U/Core.git
+	url = git@github.com:RIT-VEX-U/Core.git
