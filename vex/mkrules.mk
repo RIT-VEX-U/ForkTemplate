@@ -1,5 +1,12 @@
 # VEXcode mkrules.mk 2019_03_26_01
 
+# Helpers for writing JSON with GNU Make's built-in file function.
+comma := ,
+json_escape = $(subst ",\",$(subst \,\\,$(1)))
+object_for = $(BUILD)/CMakeFiles/$(PROJECT).dir/$(patsubst %.c,%.c.obj,$(patsubst %.cpp,%.cpp.obj,$(1)))
+compiler_for = $(if $(filter %.c,$(1)),$(CC),$(CXX))
+flags_for = $(if $(filter %.c,$(1)),$(CFLAGS),$(CXX_FLAGS))
+
 # compile C files
 $(BUILD)/CMakeFiles/$(PROJECT).dir/%.c.obj: %.c $(SRC_H)
 	$(Q)$(MKDIR)
@@ -30,3 +37,14 @@ $(BUILD)/$(PROJECTLIB).a: $(OBJ)
 clean:
 	$(info clean project)
 	$(Q)$(CLEAN)
+
+# Generate a compilation database for clangd and other C/C++ tooling.
+.PHONY: compile_commands force_compile_commands
+compile_commands: $(BUILD)/compile_commands.json
+
+$(BUILD)/compile_commands.json: force_compile_commands
+	$(Q)$(MKDIR)
+	$(file >$@,[)
+	$(foreach source,$(SRC_C),$(file >>$@,  {"directory":"$(call json_escape,$(CURDIR))","file":"$(call json_escape,$(abspath $(source)))","output":"$(call json_escape,$(abspath $(call object_for,$(source))))","command":"$(call json_escape,$(call compiler_for,$(source)) $(call flags_for,$(source)) $(INC) -c -o $(call object_for,$(source)) $(source))"}$(if $(filter $(source),$(lastword $(SRC_C))),,$(comma))))
+	$(file >>$@,])
+	$(ECHO) "Generated $@"
