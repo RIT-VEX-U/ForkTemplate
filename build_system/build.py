@@ -66,8 +66,8 @@ def get_project_name(args: argparse.Namespace) -> str:
         name = json.loads(SETTINGS_FILE.read_text(encoding="utf-8")).get("project", {}).get("name")
     name = name or "VexProject"
 
-    if any(char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-" for char in name):
-        raise SystemExit(f"Project name must contain only letters, numbers, underscores, dots, and hyphens: {name}")
+    if any(char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for char in name):
+        raise SystemExit(f"Project name must contain only letters, numbers, underscores, and dashes: {name}")
     return name
 
 
@@ -201,3 +201,85 @@ def build(args: argparse.Namespace) -> int:
 def rebuild(args: argparse.Namespace) -> int:
     clean()
     return build(args)
+
+
+def find_vexcom() -> str | None:
+    toolchain = discover_toolchain()
+    executable = "vexcom.exe" if os.name == "nt" else "vexcom"
+    bundled = toolchain.toolchain_path / "tools" / "vexcom" / executable
+    return str(bundled) if bundled.is_file() else shutil.which(executable)
+
+
+def upload(args: argparse.Namespace) -> int:
+    slot = args.slot
+    if slot is not None:
+        if not SETTINGS_FILE.exists():
+            print_step(f"Error: project settings not found: {SETTINGS_FILE}")
+            return 1
+
+        settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        settings.setdefault("project", {})["slot"] = slot
+        write_if_changed(SETTINGS_FILE, json.dumps(settings, indent="\t") + "\n")
+    elif SETTINGS_FILE.exists():
+        settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        slot = settings.get("project", {}).get("slot", 1)
+    else:
+        slot = 1
+
+    result = build(args)
+    if result != 0:
+        return result
+
+    name = get_project_name(args)
+    binary = BUILD_DIR / f"{name}.bin"
+    if not binary.exists():
+        print_step(f"Error: binary not found: {binary}")
+        return 1
+
+    vexcom = find_vexcom()
+    if vexcom is None:
+        print_step("Error: vexcom not found in the toolchain or PATH")
+        return 1
+
+    print_step(yellow(f"Uploading {binary.name} to slot {slot}..."))
+    subprocess.run(
+        [vexcom, "--chan 1"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    result = subprocess.run(
+        [vexcom, "-w", str(binary), "--progress", "-s", str(slot)],
+        cwd=ROOT,
+        check=False,
+    )
+    if result.returncode == 0:
+        print_step(green("Upload successful"))
+    return result.returncode
+
+
+def run_program(args: argparse.Namespace) -> int:
+    slot = args.slot
+    if slot is None and SETTINGS_FILE.exists():
+        settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        slot = settings.get("project", {}).get("slot", 1)
+    slot = slot or 1
+
+    vexcom = find_vexcom()
+    if vexcom is None:
+        print_step("Error: vexcom not found in the toolchain or PATH")
+        return 1
+
+    print_step(yellow(f"Running program in slot {slot}..."))
+    return subprocess.run([vexcom, "--run", "--slot", str(slot)], cwd=ROOT, check=False).returncode
+
+
+def stop() -> int:
+    vexcom = find_vexcom()
+    if vexcom is None:
+        print_step("Error: vexcom not found in the toolchain or PATH")
+        return 1
+
+    print_step(yellow("Stopping program..."))
+    return subprocess.run([vexcom, "--stop"], cwd=ROOT, check=False).returncode
