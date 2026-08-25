@@ -6,7 +6,8 @@
 			"type": "shell",
 			"command": "python",
 			"args": [
-				"${workspaceFolder}/build.py",
+				"-m",
+				"build_system",
 				"build"
 			],
 			"group": {
@@ -20,7 +21,8 @@
 			"type": "shell",
 			"command": "python",
 			"args": [
-				"${workspaceFolder}/build.py",
+				"-m",
+				"build_system",
 				"clean"
 			],
 			"problemMatcher": []
@@ -30,7 +32,8 @@
 			"type": "shell",
 			"command": "python",
 			"args": [
-				"${workspaceFolder}/build.py",
+				"-m",
+				"build_system",
 				"rebuild"
 			],
 			"problemMatcher": []

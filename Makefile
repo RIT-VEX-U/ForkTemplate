@@ -5,7 +5,7 @@ PYTHON ?= py -3
 else
 PYTHON ?= python3
 endif
-BUILD_PY := build.py
+BUILD_MODULE := build_system
 
 ifneq ($(filter run,$(MAKECMDGOALS)),)
 RUN_SLOT := $(filter-out run,$(MAKECMDGOALS))
@@ -30,19 +30,19 @@ endif
 all: build
 
 build:
-	@$(PYTHON) $(BUILD_PY) build $(ARGS)
+	@$(PYTHON) -m $(BUILD_MODULE) build $(ARGS)
 
 clean:
-	@$(PYTHON) $(BUILD_PY) clean $(ARGS)
+	@$(PYTHON) -m $(BUILD_MODULE) clean $(ARGS)
 
 rebuild:
-	@$(PYTHON) $(BUILD_PY) rebuild $(ARGS)
+	@$(PYTHON) -m $(BUILD_MODULE) rebuild $(ARGS)
 
 upload:
-	@$(PYTHON) $(BUILD_PY) upload $(if $(UPLOAD_SLOT),--slot $(UPLOAD_SLOT)) $(ARGS)
+	@$(PYTHON) -m $(BUILD_MODULE) upload $(if $(UPLOAD_SLOT),--slot $(UPLOAD_SLOT)) $(ARGS)
 
 run:
-	@$(PYTHON) $(BUILD_PY) run $(RUN_SLOT)
+	@$(PYTHON) -m $(BUILD_MODULE) run $(RUN_SLOT)
 
 stop:
-	@$(PYTHON) $(BUILD_PY) stop
+	@$(PYTHON) -m $(BUILD_MODULE) stop
