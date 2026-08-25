@@ -1,4 +1,5 @@
 /bin
 /build
+__pycache__/
 .vscode/BROWSE.VC.DB*
 /.cache
