@@ -53,13 +53,12 @@ LINK_LIBS = [
 ]
 OBJDUMP_FLAGS = ["--source", "--line-numbers", "--demangle", "--disassemble"]
 
-
 def write_if_changed(path: Path, content: str) -> None:
     if not path.exists() or path.read_text(encoding="utf-8") != content:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
 
-
+# gets the project name from vex_project_settings.json, checking allowed characters
 def get_project_name(args: argparse.Namespace) -> str:
     name = args.project_name
     if not name and SETTINGS_FILE.exists():
@@ -70,7 +69,7 @@ def get_project_name(args: argparse.Namespace) -> str:
         raise SystemExit(f"Project name must contain only letters, numbers, underscores, and dashes: {name}")
     return name
 
-
+# generates the makefile and compile_commands.json for clangd
 def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, quiet: bool) -> None:
     includes = [f"-I{path}" for path in PROJECT_INCLUDES]
     system_includes = [
@@ -85,6 +84,7 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
     ]
     base_flags = [f"-resource-dir={toolchain.resource_dir}", *COMMON_FLAGS, *(["-w"] if quiet else WARNING_FLAGS)]
 
+    # write compile_commands.json
     commands = []
     for source in sources:
         obj = BUILD_DIR / "objects" / f"{source.relative_to(ROOT)}.obj"
@@ -95,6 +95,7 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
 
     write_if_changed(BUILD_DIR / "compile_commands.json", json.dumps(commands, indent=2) + "\n")
 
+    # write Makefile
     obj_list = " \\\n  ".join(f"$(OBJROOT)/{source.relative_to(ROOT).as_posix()}.obj" for source in sources)
     ld_flags = ["-z", "norelro", "-T", toolchain.linker_script.as_posix(), "--gc-sections", f"-L{toolchain.sdk_path.as_posix()}", f"-L{toolchain.newlib_lib_dir.as_posix()}"]
     makefile_path = BUILD_DIR / "Makefile"
@@ -153,7 +154,7 @@ $(ASM): $(ELF)
 """
     write_if_changed(makefile_path, makefile)
 
-
+# remove the build directory
 def clean() -> int:
     if BUILD_DIR.exists():
         shutil.rmtree(BUILD_DIR)
@@ -162,7 +163,7 @@ def clean() -> int:
         print_step(yellow("Build directory does not exist"))
     return 0
 
-
+# compile changed files, link, strip
 def build(args: argparse.Namespace) -> int:
     start_time = time.time()
     name = get_project_name(args)
@@ -197,21 +198,22 @@ def build(args: argparse.Namespace) -> int:
     print_step(green(f"Build successful ({time.time() - start_time:.1f}s)"))
     return 0
 
-
+# clean build
 def rebuild(args: argparse.Namespace) -> int:
     clean()
     return build(args)
 
-
+# check for vexcom in the toolchain then try using path
 def find_vexcom() -> str | None:
     toolchain = discover_toolchain()
     executable = "vexcom.exe" if os.name == "nt" else "vexcom"
     bundled = toolchain.toolchain_path / "tools" / "vexcom" / executable
     return str(bundled) if bundled.is_file() else shutil.which(executable)
 
-
+# use vexcom to upload into slot
 def upload(args: argparse.Namespace) -> int:
     slot = args.slot
+    # if slot provided, update vex_project_settings.json, else use from file
     if slot is not None:
         if not SETTINGS_FILE.exists():
             print_step(f"Error: project settings not found: {SETTINGS_FILE}")
@@ -242,6 +244,7 @@ def upload(args: argparse.Namespace) -> int:
         return 1
 
     print_step(yellow(f"Uploading {binary.name} to slot {slot}..."))
+    # before uploading attempt to switch to download radio for faster controller upload
     subprocess.run(
         [vexcom, "--chan 1"],
         cwd=ROOT,
@@ -258,7 +261,7 @@ def upload(args: argparse.Namespace) -> int:
         print_step(green("Upload successful"))
     return result.returncode
 
-
+# runs program in slot
 def run_program(args: argparse.Namespace) -> int:
     slot = args.slot
     if slot is None and SETTINGS_FILE.exists():
@@ -274,7 +277,7 @@ def run_program(args: argparse.Namespace) -> int:
     print_step(yellow(f"Running program in slot {slot}..."))
     return subprocess.run([vexcom, "--run", "--slot", str(slot)], cwd=ROOT, check=False).returncode
 
-
+# stops currently running program
 def stop() -> int:
     vexcom = find_vexcom()
     if vexcom is None:

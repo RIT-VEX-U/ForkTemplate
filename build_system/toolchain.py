@@ -38,17 +38,17 @@ class Toolchain:
     newlib_lib_dir: Path
     linker_script: Path
 
-
+# makes a request of a url
 def request(url: str) -> urllib.request.Request:
     return urllib.request.Request(url, headers={"User-Agent": "build"})
 
-
+# downloads a file from a url
 def download(url: str, dest: Path) -> None:
     print(f"Downloading {url}...", flush=True)
     with urllib.request.urlopen(request(url)) as response, dest.open("wb") as output:
         shutil.copyfileobj(response, output)
 
-
+# downloads latest VEX sdk from their website
 def get_sdk() -> Path:
     if sdks := sorted(VEX_DIR.glob("V5_*/vexv5"), reverse=True):
         return sdks[0]
@@ -67,7 +67,7 @@ def get_sdk() -> Path:
 
     return sdk_path
 
-
+# gets a toolchain object with all the tool paths, downloads if not already installed
 def discover_toolchain() -> Toolchain:
     sdk_path = get_sdk()
     toolchain_path = VEX_DIR / ATFE_NAME
