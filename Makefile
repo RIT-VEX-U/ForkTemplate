@@ -17,6 +17,16 @@ endif
 	@:
 endif
 
+ifneq ($(filter upload,$(MAKECMDGOALS)),)
+UPLOAD_SLOT := $(filter-out upload,$(MAKECMDGOALS))
+ifneq ($(filter-out 1 2 3 4 5 6 7 8,$(UPLOAD_SLOT)),)
+$(error Usage: make upload [1-8])
+endif
+.PHONY: 1 2 3 4 5 6 7 8
+1 2 3 4 5 6 7 8:
+	@:
+endif
+
 all: build
 
 build:
@@ -29,7 +39,7 @@ rebuild:
 	@$(PYTHON) $(BUILD_PY) rebuild $(ARGS)
 
 upload:
-	@$(PYTHON) $(BUILD_PY) upload $(ARGS)
+	@$(PYTHON) $(BUILD_PY) upload $(if $(UPLOAD_SLOT),--slot $(UPLOAD_SLOT)) $(ARGS)
 
 run:
 	@$(PYTHON) $(BUILD_PY) run $(RUN_SLOT)
