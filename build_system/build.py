@@ -30,6 +30,10 @@ COMMON_FLAGS = [
     "-Os",
     "-g3",
     "-fcolor-diagnostics",
+    "-U__INT32_TYPE__",
+    "-U__UINT32_TYPE__",
+    "-D__INT32_TYPE__=long",
+    "-D__UINT32_TYPE__=unsigned long",
 ]
 C_FLAGS = ["-std=gnu99"]
 CXX_FLAGS = [
