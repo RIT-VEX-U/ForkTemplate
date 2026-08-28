@@ -2,8 +2,8 @@ BasedOnStyle: Google
 ColumnLimit: 100
 
 #Indents
-IndentWidth: 4
-ContinuationIndentWidth: 8
+IndentWidth: 2
+ContinuationIndentWidth: 4
 UseTab: Never
 AlwaysBreakTemplateDeclarations: 'Yes'
 
@@ -30,5 +30,5 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 
 #Bin Packing
-BinPackArguments: false
-BinPackParameters: false
+BinPackArguments: true
+BinPackParameters: true
