@@ -18,6 +18,7 @@ PROJECT_INCLUDES = (
     ROOT / "core" / "include",
     ROOT / "vendor" / "eigen",
     ROOT / "vendor" / "gcem" / "include",
+    ROOT / "vendor" / "cevalm" / "include",
 )
 
 COMMON_FLAGS = [
@@ -40,7 +41,7 @@ CXX_FLAGS = [
     "-fno-rtti",
     "-fno-threadsafe-statics",
     "-fno-exceptions",
-    "-std=gnu++23",
+    "-std=gnu++26",
     "-ffunction-sections",
     "-fdata-sections",
 ]
@@ -95,6 +96,9 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
         lang_flags = CXX_FLAGS if source.suffix == ".cpp" else C_FLAGS
         cmd_args = [*base_flags, *lang_flags, *includes, *system_includes, "-MMD", "-MP", "-MF", str(obj.with_suffix(".obj.d")), "-o", str(obj), "-c", str(source)]
         driver = "clang++" if source.suffix == ".cpp" else "clang"
+        driver = str(toolchain.toolchain_path / "bin" / (
+            "clang++.exe" if os.name == "nt" else "clang++"
+        ))
         commands.append({"directory": str(ROOT), "arguments": [driver, *cmd_args], "file": str(source), "output": str(obj)})
 
     write_if_changed(BUILD_DIR / "compile_commands.json", json.dumps(commands, indent=2) + "\n")
