@@ -13,4 +13,7 @@
         wait(5, msec);       \
     } while (!(condition))
 
-#define repeat(iterations) for (int iterator = 0; iterator < iterations; iterator++)
+#define repeat(iterations) for (int iterator = 0; iterator < iterations; iterator++)    \
+  do {                                                                                  \
+    wait(5, msec);                                                                      \
+  } while (!(condition))
