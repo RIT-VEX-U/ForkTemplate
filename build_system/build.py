@@ -7,12 +7,19 @@ import shlex
 import shutil
 import subprocess
 import time
+from datetime import datetime
 from pathlib import Path
 
 from .toolchain import Toolchain, discover_toolchain
 from .util import BUILD_DIR, ROOT, SETTINGS_FILE, blue, bold, green, print_step, yellow
 
-SOURCE_GLOBS = ("src/**/*.c", "src/**/*.cpp", "core/src/**/*.c", "core/src/**/*.cpp")
+SOURCE_GLOBS = (
+    "src/**/*.c",
+    "src/**/*.cpp",
+    "core/src/**/*.c",
+    "core/src/**/*.cpp",
+    "build_system/runtime_compat.c",
+)
 PROJECT_INCLUDES = (
     ROOT / "include",
     ROOT / "core" / "include",
@@ -105,7 +112,16 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
 
     # write Makefile
     obj_list = " \\\n  ".join(f"$(OBJROOT)/{source.relative_to(ROOT).as_posix()}.obj" for source in sources)
-    ld_flags = ["-z", "norelro", "-T", toolchain.linker_script.as_posix(), "--gc-sections", f"-L{toolchain.sdk_path.as_posix()}", f"-L{toolchain.newlib_lib_dir.as_posix()}"]
+    ld_flags = [
+        "-z",
+        "norelro",
+        "-T",
+        toolchain.linker_script.as_posix(),
+        "--gc-sections",
+        "--wrap=vexSystemStdlibImpureDataAddr",
+        f"-L{toolchain.sdk_path.as_posix()}",
+        f"-L{toolchain.newlib_lib_dir.as_posix()}",
+    ]
     makefile_path = BUILD_DIR / "Makefile"
 
     makefile = f"""\
@@ -174,6 +190,7 @@ def clean() -> int:
 # compile changed files, link, strip
 def build(args: argparse.Namespace) -> int:
     start_time = time.time()
+    print(datetime.now().strftime("Time of Build: %I:%M:%S %p"))
     name = get_project_name(args)
     toolchain = discover_toolchain()
     sources = sorted(source for glob in SOURCE_GLOBS for source in ROOT.glob(glob))
