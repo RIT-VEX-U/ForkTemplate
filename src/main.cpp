@@ -11,8 +11,8 @@ vex::competition comp;
  * competition/autonomous.cpp
  */
 int main() {
-    comp.autonomous(autonomous);
-    comp.drivercontrol(opcontrol);
+  comp.autonomous(autonomous);
+  comp.drivercontrol(opcontrol);
 
-    robot_init();
+  robot_init();
 }
