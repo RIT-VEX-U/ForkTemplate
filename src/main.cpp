@@ -1,9 +1,7 @@
-#include "vex.h"
-
-#include "robot-config.h"
-
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
+#include "robot-config.h"
+#include "vex.h"
 
 vex::competition comp;
 
