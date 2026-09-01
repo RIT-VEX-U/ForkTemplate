@@ -7,17 +7,25 @@ import shlex
 import shutil
 import subprocess
 import time
+from datetime import datetime
 from pathlib import Path
 
 from .toolchain import Toolchain, discover_toolchain
 from .util import BUILD_DIR, ROOT, SETTINGS_FILE, blue, bold, green, print_step, yellow
 
-SOURCE_GLOBS = ("src/**/*.c", "src/**/*.cpp", "core/src/**/*.c", "core/src/**/*.cpp")
+SOURCE_GLOBS = (
+    "src/**/*.c",
+    "src/**/*.cpp",
+    "core/src/**/*.c",
+    "core/src/**/*.cpp",
+    "build_system/runtime_compat.c",
+)
 PROJECT_INCLUDES = (
     ROOT / "include",
     ROOT / "core" / "include",
     ROOT / "vendor" / "eigen",
     ROOT / "vendor" / "gcem" / "include",
+    ROOT / "vendor" / "cevalm" / "include",
 )
 
 COMMON_FLAGS = [
@@ -30,13 +38,17 @@ COMMON_FLAGS = [
     "-Os",
     "-g3",
     "-fcolor-diagnostics",
+    "-U__INT32_TYPE__",
+    "-U__UINT32_TYPE__",
+    "-D__INT32_TYPE__=long",
+    "-D__UINT32_TYPE__=unsigned long",
 ]
 C_FLAGS = ["-std=gnu99"]
 CXX_FLAGS = [
     "-fno-rtti",
     "-fno-threadsafe-statics",
     "-fno-exceptions",
-    "-std=gnu++23",
+    "-std=gnu++26",
     "-ffunction-sections",
     "-fdata-sections",
 ]
@@ -91,13 +103,25 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
         lang_flags = CXX_FLAGS if source.suffix == ".cpp" else C_FLAGS
         cmd_args = [*base_flags, *lang_flags, *includes, *system_includes, "-MMD", "-MP", "-MF", str(obj.with_suffix(".obj.d")), "-o", str(obj), "-c", str(source)]
         driver = "clang++" if source.suffix == ".cpp" else "clang"
+        driver = str(toolchain.toolchain_path / "bin" / (
+            "clang++.exe" if os.name == "nt" else "clang++"
+        ))
         commands.append({"directory": str(ROOT), "arguments": [driver, *cmd_args], "file": str(source), "output": str(obj)})
 
     write_if_changed(BUILD_DIR / "compile_commands.json", json.dumps(commands, indent=2) + "\n")
 
     # write Makefile
     obj_list = " \\\n  ".join(f"$(OBJROOT)/{source.relative_to(ROOT).as_posix()}.obj" for source in sources)
-    ld_flags = ["-z", "norelro", "-T", toolchain.linker_script.as_posix(), "--gc-sections", f"-L{toolchain.sdk_path.as_posix()}", f"-L{toolchain.newlib_lib_dir.as_posix()}"]
+    ld_flags = [
+        "-z",
+        "norelro",
+        "-T",
+        toolchain.linker_script.as_posix(),
+        "--gc-sections",
+        "--wrap=vexSystemStdlibImpureDataAddr",
+        f"-L{toolchain.sdk_path.as_posix()}",
+        f"-L{toolchain.newlib_lib_dir.as_posix()}",
+    ]
     makefile_path = BUILD_DIR / "Makefile"
 
     makefile = f"""\
@@ -193,9 +217,10 @@ def build(args: argparse.Namespace) -> int:
     for suffix in ("elf", "bin", "S"):
         artifact = BUILD_DIR / f"{name}.{suffix}"
         if artifact.exists():
-            print_step(green(f"Output: {artifact.name} ({artifact.stat().st_size:,} bytes)"))
+            print_step(green("Output: ") + f"{artifact.name} ({artifact.stat().st_size:,} bytes)")
 
     print_step(green(f"Build successful ({time.time() - start_time:.1f}s)"))
+    print(datetime.now().strftime(green("Time of Build: ") + ("%I:%M:%S %p")))
     return 0
 
 # clean build
