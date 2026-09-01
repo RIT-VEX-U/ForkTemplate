@@ -3,6 +3,10 @@
 #include "core.h"
 #include "vex.h"
 
+extern vex::brain Brain;
+extern vex::competition comp;
+extern vex::controller con;
+
 // ================ INPUTS ================
 // Digital sensors
 
@@ -17,4 +21,4 @@
 
 // ================ UTILS ================
 
-void robot_init();
+extern Initializer initializer;

@@ -3,6 +3,6 @@
 /**
  * Main entrypoint for the driver control period
  */
-void opcontrol();
+extern void (*opcontrol_ptr)();
 
-void skills();
+void opcontrol();
