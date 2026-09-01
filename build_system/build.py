@@ -190,7 +190,6 @@ def clean() -> int:
 # compile changed files, link, strip
 def build(args: argparse.Namespace) -> int:
     start_time = time.time()
-    print(datetime.now().strftime("Time of Build: %I:%M:%S %p"))
     name = get_project_name(args)
     toolchain = discover_toolchain()
     sources = sorted(source for glob in SOURCE_GLOBS for source in ROOT.glob(glob))
@@ -218,9 +217,10 @@ def build(args: argparse.Namespace) -> int:
     for suffix in ("elf", "bin", "S"):
         artifact = BUILD_DIR / f"{name}.{suffix}"
         if artifact.exists():
-            print_step(green(f"Output: {artifact.name} ({artifact.stat().st_size:,} bytes)"))
+            print_step(green("Output: ") + f"{artifact.name} ({artifact.stat().st_size:,} bytes)")
 
     print_step(green(f"Build successful ({time.time() - start_time:.1f}s)"))
+    print(datetime.now().strftime(green("Time of Build: ") + ("%I:%M:%S %p")))
     return 0
 
 # clean build
