@@ -9,7 +9,7 @@ from pathlib import Path
 VEX_DIR = Path.home() / ".vex" / "vexcode"
 OS_MAP = {"Windows": "Windows-x86_64", "Darwin": "Darwin-universal", "Linux": "Linux-x86_64"}
 SDK_MANIFEST = "https://content.vexrobotics.com/vexos/public/V5/vscode/sdk/cpp/manifest.json"
-LSCRIPT_URL = "https://github.com/RIT-VEX-U/ForkTemplate/releases/download/22.1/lscript_llvm.ld"
+LSCRIPT_URL = "https://gist.githubusercontent.com/PascalSkylake/bf9e3d4b1dbdbbae2b40add09e99ecdb/raw/lscript_llvm.ld"
 ATFE_VERSION = "22.1.0"
 ATFE_RELEASE = "22.1"
 CLANG_VERSION = ATFE_VERSION.split(".", maxsplit=1)[0]
@@ -51,19 +51,22 @@ def download(url: str, dest: Path) -> None:
 # downloads latest VEX sdk from their website
 def get_sdk() -> Path:
     if sdks := sorted(VEX_DIR.glob("V5_*/vexv5"), reverse=True):
-        return sdks[0]
+        sdk_path = sdks[0]
+    else:
+        VEX_DIR.mkdir(parents=True, exist_ok=True)
+        with urllib.request.urlopen(request(SDK_MANIFEST)) as response:
+            latest = json.load(response)["latest"]
 
-    VEX_DIR.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(request(SDK_MANIFEST)) as response:
-        latest = json.load(response)["latest"]
+        sdk_path = VEX_DIR / latest / "vexv5"
+        zip_path = VEX_DIR / f"{latest}.zip"
 
-    sdk_path = VEX_DIR / latest / "vexv5"
-    zip_path = VEX_DIR / f"{latest}.zip"
+        download(f"https://content.vexrobotics.com/vexos/public/V5/vscode/sdk/cpp/{latest}.zip", zip_path)
+        shutil.unpack_archive(zip_path, VEX_DIR)
+        zip_path.unlink()
 
-    download(f"https://content.vexrobotics.com/vexos/public/V5/vscode/sdk/cpp/{latest}.zip", zip_path)
-    shutil.unpack_archive(zip_path, VEX_DIR)
-    zip_path.unlink()
-    download(LSCRIPT_URL, sdk_path / "lscript_llvm.ld")
+    linker_script = sdk_path / "lscript_llvm.ld"
+    if not linker_script.is_file():
+        download(LSCRIPT_URL, linker_script)
 
     return sdk_path
 
