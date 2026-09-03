@@ -47,5 +47,5 @@ strategy = "differential"
 # Terminal behavior on program run
 #   "interactive"  - attach stdin and stdout, Ctrl-C stops the program.
 #   "watch"        - attach stdout, Ctrl-C detaches but program continues.
-#   "none"         - start the program with no stdio..
+#   "none"         - start the program with no io.
 terminal = "interactive"
