@@ -94,9 +94,7 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
         lang_flags = CXX_FLAGS if source.suffix == ".cpp" else C_FLAGS
         cmd_args = [*base_flags, *lang_flags, *includes, *system_includes, "-MMD", "-MP", "-MF", str(obj.with_suffix(".obj.d")), "-o", str(obj), "-c", str(source)]
         driver = "clang++" if source.suffix == ".cpp" else "clang"
-        driver = str(toolchain.toolchain_path / "bin" / (
-            "clang++.exe" if os.name == "nt" else "clang++"
-        ))
+        if os.name == "nt" driver += ".exe":
         commands.append({"directory": str(ROOT), "arguments": [driver, *cmd_args], "file": str(source), "output": str(obj)})
 
     write_if_changed(BUILD_DIR / "compile_commands.json", json.dumps(commands, indent=2) + "\n")
@@ -186,6 +184,7 @@ def build(args: argparse.Namespace, settings: ProjectSettings | None = None) -> 
     settings = settings or load_settings()
     name = settings.name
     toolchain = discover_toolchain(settings.sdk)
+    # vex extension compatability, updates .vscode/vex_project_settings.json
     sync_vscode(settings, toolchain.sdk_path.parent.name)
     sources = sorted(source for glob in SOURCE_GLOBS for source in ROOT.glob(glob))
     jobs = args.parallel or os.cpu_count() or 1
@@ -201,6 +200,7 @@ def build(args: argparse.Namespace, settings: ProjectSettings | None = None) -> 
 
     generate_build_files(name, sources, toolchain, args.quiet)
 
+    # run make
     result = subprocess.run(
         [str(toolchain.make), "--silent", "--no-print-directory", "-f", str(BUILD_DIR / "Makefile"), f"-j{jobs}"],
         cwd=ROOT,
@@ -248,6 +248,12 @@ def upload(args: argparse.Namespace) -> int:
         update_setting("upload", "slot", args.slot)
     settings = load_settings()
     vflash = find_vflash(settings)
+
+    if vflash is None:
+        print_step("Error: vflash not found in the toolchain or PATH")
+        return 1
+
+    # preemptively switch to download channel
     channel_process = prepare_download_channel(vflash) if vflash is not None else None
 
     try:
@@ -255,18 +261,15 @@ def upload(args: argparse.Namespace) -> int:
     finally:
         if channel_process is not None:
             channel_process.wait()
+
     if result != 0:
         return result
 
-    settings = load_settings()
     binary = BUILD_DIR / f"{settings.name}.bin"
     if not binary.exists():
         print_step(f"Error: binary not found: {binary}")
         return 1
 
-    if vflash is None:
-        print_step("Error: vflash not found in the toolchain or PATH")
-        return 1
 
     print_step(yellow(f"Uploading {binary.name} to slot {settings.slot} ({settings.strategy})..."))
     result = subprocess.run(
