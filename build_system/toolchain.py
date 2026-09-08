@@ -83,6 +83,11 @@ def get_sdk(version: str = "latest") -> Path:
 def discover_toolchain(sdk_version: str = "latest") -> Toolchain:
     sdk_path = get_sdk(sdk_version)
     toolchain_path = VEX_DIR / ATFE_NAME
+    exe = ".exe" if os.name == "nt" else ""
+    vflash = toolchain_path / "tools" / "vflash" / f"vflash{exe}"
+
+    if toolchain_path.exists() and not vflash.is_file():
+        shutil.rmtree(toolchain_path)
 
     if not toolchain_path.exists():
         VEX_DIR.mkdir(parents=True, exist_ok=True)
@@ -91,7 +96,6 @@ def discover_toolchain(sdk_version: str = "latest") -> Toolchain:
         shutil.unpack_archive(tar_path, VEX_DIR)
         tar_path.unlink()
 
-    exe = ".exe" if os.name == "nt" else ""
     bin_dir = toolchain_path / "bin"
 
     return Toolchain(
@@ -103,7 +107,7 @@ def discover_toolchain(sdk_version: str = "latest") -> Toolchain:
         objdump=bin_dir / f"llvm-objdump{exe}",
         size=bin_dir / f"llvm-size{exe}",
         make=toolchain_path / "tools" / f"make{exe}",
-        vflash=toolchain_path / "tools" / "vflash" / f"vflash{exe}",
+        vflash=vflash,
         resource_dir=toolchain_path / f"lib/clang/{CLANG_VERSION}",
         cxx_include_dir=toolchain_path / "lib/clang-runtimes/newlib/arm-none-eabi/include/c++/v1",
         newlib_include_dir=toolchain_path / "lib/clang-runtimes/newlib/arm-none-eabi/include",
