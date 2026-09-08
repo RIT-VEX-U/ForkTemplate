@@ -94,7 +94,8 @@ def generate_build_files(name: str, sources: list[Path], toolchain: Toolchain, q
         lang_flags = CXX_FLAGS if source.suffix == ".cpp" else C_FLAGS
         cmd_args = [*base_flags, *lang_flags, *includes, *system_includes, "-MMD", "-MP", "-MF", str(obj.with_suffix(".obj.d")), "-o", str(obj), "-c", str(source)]
         driver = "clang++" if source.suffix == ".cpp" else "clang"
-        if os.name == "nt" driver += ".exe":
+        if os.name == "nt":
+            driver += ".exe"
         commands.append({"directory": str(ROOT), "arguments": [driver, *cmd_args], "file": str(source), "output": str(obj)})
 
     write_if_changed(BUILD_DIR / "compile_commands.json", json.dumps(commands, indent=2) + "\n")
