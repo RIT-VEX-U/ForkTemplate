@@ -13,7 +13,8 @@
 #include "core/subsystems/odometry/odometry_base.h"
 #include "core/subsystems/odometry/odometry_nwheel.h"
 #include "core/subsystems/odometry/odometry_tank.h"
-#include "core/subsystems/screen.h"
+#include "core/subsystems/screen/legacy.h"
+#include "core/subsystems/screen/legacy_bridge.h"
 #include "core/subsystems/tank_drive.h"
 
 // Utils package
@@ -33,6 +34,7 @@
 #include "core/utils/formatting.h"
 #include "core/utils/geometry.h"
 #include "core/utils/graph_drawer.h"
+#include "core/utils/initializer.h"
 #include "core/utils/interpolating_map.h"
 #include "core/utils/logger.h"
 #include "core/utils/math/estimator/kalman_filter.h"
