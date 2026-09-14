@@ -1,7 +1,7 @@
 #pragma once
 
 // Device package
-#include "core/device/cobs_device.h"
+#include "core/device/wrapper_device.hpp"
 
 // Subsystems package
 #include "core/subsystems/custom_encoder.h"
@@ -12,8 +12,11 @@
 #include "core/subsystems/odometry/odometry_3wheel.h"
 #include "core/subsystems/odometry/odometry_base.h"
 #include "core/subsystems/odometry/odometry_nwheel.h"
+#include "core/subsystems/odometry/odometry_serial.h"
 #include "core/subsystems/odometry/odometry_tank.h"
-#include "core/subsystems/screen.h"
+#include "core/subsystems/screen/legacy.h"
+#include "core/subsystems/screen/legacy_bridge.h"
+#include "core/subsystems/screen/screen_controller.h"
 #include "core/subsystems/tank_drive.h"
 
 // Utils package
@@ -33,10 +36,12 @@
 #include "core/utils/formatting.h"
 #include "core/utils/geometry.h"
 #include "core/utils/graph_drawer.h"
+#include "core/utils/initializer.h"
 #include "core/utils/interpolating_map.h"
 #include "core/utils/logger.h"
 #include "core/utils/math/estimator/kalman_filter.h"
 #include "core/utils/math/estimator/unscented_kalman_filter.h"
+#include "core/utils/math/geometry/point2d.h"
 #include "core/utils/math/geometry/pose2d.h"
 #include "core/utils/math/geometry/rotation2d.h"
 #include "core/utils/math/geometry/transform2d.h"
@@ -50,6 +55,7 @@
 #include "core/utils/moving_average.h"
 #include "core/utils/pure_pursuit.h"
 #include "core/utils/state_machine.h"
+#include "core/utils/units.h"
 
 // Base package
 #include "core/robot_specs.h"
