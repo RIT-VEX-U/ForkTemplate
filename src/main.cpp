@@ -1,11 +1,8 @@
 #include "vex.h"
 
 #include "robot-config.h"
-
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
-
-vex::competition comp;
 
 /**
  * Entry point to the program. No code should be placed here;
@@ -13,8 +10,8 @@ vex::competition comp;
  * competition/autonomous.cpp
  */
 int main() {
-  comp.autonomous(autonomous);
-  comp.drivercontrol(opcontrol);
+  initializer.initialize();
 
-  robot_init();
+  competition.autonomous(autonomous_ptr);
+  competition.drivercontrol(opcontrol_ptr);
 }
