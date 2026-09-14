@@ -2,6 +2,12 @@
 
 // Device package
 #include "core/device/cobs_device.h"
+#include "core/device/vdb/builtins.hpp"
+#include "core/device/vdb/crc32.hpp"
+#include "core/device/vdb/protocol.hpp"
+#include "core/device/vdb/registry-controller.hpp"
+#include "core/device/vdb/types.hpp"
+#include "core/device/vdb/visitor.hpp"
 #include "core/device/wrapper_device.hpp"
 
 // Subsystems package
