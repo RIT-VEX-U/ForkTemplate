@@ -1,6 +1,7 @@
 #pragma once
 
 // Device package
+#include "core/device/cobs_device.h"
 #include "core/device/wrapper_device.hpp"
 
 // Subsystems package
