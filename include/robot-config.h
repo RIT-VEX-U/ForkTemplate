@@ -1,7 +1,12 @@
 #pragma once
 
-#include "core.h"
-#include "vex.h"
+#include "core/core.h"
+#include "vex/vex.h"
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // ================ VEX ================
 
