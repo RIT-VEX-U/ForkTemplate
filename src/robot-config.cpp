@@ -1,15 +1,14 @@
 #include "robot-config.h"
+
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
-
 
 vex::brain brain;
 vex::competition competition;
 vex::controller controller;
 
-
-vex::motor mot1(vex::PORT1);
-vex::motor mot2(vex::PORT2);
+vex::motor mot1(vex::PORT2);
+vex::motor mot2(vex::PORT3);
 
 int mot1_speed = mot1.velocity(vex::velocityUnits::rpm);
 int mot1_pos = mot1.position(vex::rotationUnits::rev);
@@ -31,27 +30,18 @@ VDP::Record mot2_info("motor info", mot2_speed_f, mot2_pos_f);
 std::vector<Initialization> inits = {};
 
 LegacyScreen::LegacyPage init_page, match_page;
-Initializer initializer(inits, LegacyScreen::InitializerPage::timed_selector(20),
-LegacyScreen::pre_initialize(brain, initializer, &init_page), []() {
-    // Initialization code here
-  printf("%s", mot1_info.data_to_string().c_str());
+Initializer initializer([]() {
+  // Initialization code here
   mot1_speed = 55;
 
-  printf("%s", mot1_info.data_to_string().c_str());
-
   VDP::Packet mot2_serialized = mot2_info.serialize_data();
-
-  for(uint8_t byte: mot2_serialized) {
-    printf("%d\n", byte);
-  }
 
   mot1_info.apply_update(mot2_serialized);
 
   VDB::Device debug_board(vex::PORT1, 9600, chan0);
 
-  printf("%s", mot1_info.data_to_string().c_str());
-
   while (true) {
     debug_board.send_channel(0);
+    vexDelay(100);
   }
 });
