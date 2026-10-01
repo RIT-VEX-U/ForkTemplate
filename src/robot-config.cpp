@@ -1,5 +1,10 @@
 #include "robot-config.h"
 
+#include <vex_global.h>
+#include <vex_units.h>
+
+#include <cstdio>
+
 #include "competition/autonomous.h"
 #include "competition/opcontrol.h"
 
@@ -8,40 +13,32 @@ vex::competition competition;
 vex::controller controller;
 
 vex::motor mot1(vex::PORT2);
-vex::motor mot2(vex::PORT3);
 
-int mot1_speed = mot1.velocity(vex::velocityUnits::rpm);
-int mot1_pos = mot1.position(vex::rotationUnits::rev);
+double mot1_speed = mot1.velocity(vex::velocityUnits::rpm);
+double mot1_pos = mot1.position(vex::rotationUnits::deg);
+double mot1_volts = 0;
 
 VDP::Field mot1_speed_f("mot1 speed", mot1_speed);
 VDP::Field mot1_pos_f("mot1 position", mot1_pos);
+VDP::Field mot1_volts_f("mot1 voltage", mot1_volts);
 
-VDP::Record mot1_info("motor info", mot1_speed_f, mot1_pos_f);
+VDP::Record mot1_info("motor info", mot1_speed_f, mot1_pos_f, mot1_volts_f);
 
 VDP::Channel chan0(mot1_info, 0);
 
-int mot2_speed = 40;
-int mot2_pos = 20;
-
-VDP::Field mot2_speed_f("mot1 speed", mot1_speed);
-VDP::Field mot2_pos_f("mot1 position", mot1_pos);
-
-VDP::Record mot2_info("motor info", mot2_speed_f, mot2_pos_f);
 std::vector<Initialization> inits = {};
 
 LegacyScreen::LegacyPage init_page, match_page;
 Initializer initializer([]() {
   // Initialization code here
-  mot1_speed = 55;
-
-  VDP::Packet mot2_serialized = mot2_info.serialize_data();
-
-  mot1_info.apply_update(mot2_serialized);
-
   VDB::Device debug_board(vex::PORT1, 9600, chan0);
 
   while (true) {
+    mot1_speed = mot1.velocity(vex::velocityUnits::rpm);
+    mot1_pos = mot1.position(vex::rotationUnits::deg);
+    mot1.spin(vex::directionType::fwd, mot1_volts, vex::voltageUnits::volt);
     debug_board.send_channel(0);
     vexDelay(100);
+    printf("mot1 volts %f\n", mot1_volts);
   }
 });
