@@ -23,12 +23,10 @@ from .util import BUILD_DIR, PROJECT_FILE, ROOT, blue, bold, green, print_step, 
 SOURCE_GLOBS = (
     "src/**/*.c",
     "src/**/*.cpp",
-    "core/src/**/*.c",
-    "core/src/**/*.cpp",
 )
 PROJECT_INCLUDES = (
     ROOT / "include",
-    ROOT / "core" / "include",
+    ROOT / "src",
     ROOT / "vendor" / "eigen",
     ROOT / "vendor" / "gcem" / "include",
     ROOT / "vendor" / "cevalm" / "include",
