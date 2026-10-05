@@ -40,7 +40,6 @@
 #include "core/utils/controls/state_space/linear_plant_inversion_feedforward.h"
 #include "core/utils/controls/state_space/linear_quadratic_regulator.h"
 #include "core/utils/controls/trapezoid_profile.h"
-#include "core/utils/geometry.h"
 #include "core/utils/graph_drawer.h"
 #include "core/utils/initializer.h"
 #include "core/utils/interpolating_map.h"
