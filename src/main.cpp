@@ -1,4 +1,4 @@
-#include "vex.h"
+#include "vex/vex.h"
 
 #include "robot-config.h"
 #include "competition/autonomous.h"
