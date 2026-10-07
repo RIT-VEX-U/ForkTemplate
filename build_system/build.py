@@ -30,7 +30,7 @@ PROJECT_INCLUDES = (
     ROOT / "include",
     ROOT / "core" / "include",
     ROOT / "vendor" / "eigen",
-    ROOT / "vendor" / "gcem" / "include",
+    ROOT / "vendor" / "include",
     ROOT / "vendor" / "cevalm" / "include",
 )
 

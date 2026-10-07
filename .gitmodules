@@ -2,9 +2,6 @@
 	path = vendor/eigen
 	url = https://gitlab.com/libeigen/eigen.git
 	branch = 5.0.1
-[submodule "vendor/gcem"]
-	path = vendor/gcem
-	url = https://github.com/kthohr/gcem.git
 [submodule "core"]
 	path = core
 	url = https://github.com/RIT-VEX-U/Core
