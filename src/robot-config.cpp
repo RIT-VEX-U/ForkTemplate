@@ -31,14 +31,13 @@ std::vector<Initialization> inits = {};
 LegacyScreen::LegacyPage init_page, match_page;
 Initializer initializer([]() {
   // Initialization code here
-  VDB::Device debug_board(vex::PORT1, 9600, chan0);
+  VDB::Device debug_board(vex::PORT1, 921600, chan0);
 
   while (true) {
     mot1_speed = mot1.velocity(vex::velocityUnits::rpm);
     mot1_pos = mot1.position(vex::rotationUnits::deg);
     mot1.spin(vex::directionType::fwd, mot1_volts, vex::voltageUnits::volt);
     debug_board.send_channel(0);
-    vexDelay(100);
-    printf("mot1 volts %f\n", mot1_volts);
+    vexDelay(10);
   }
 });
